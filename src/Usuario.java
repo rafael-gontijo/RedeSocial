@@ -42,7 +42,6 @@ public class Usuario {
         return mensagensRecebidas;
     }
 
-    // Métodos adicionados para flexibilidade e validações
     public void adicionarAmigo(Amigo amigo) {
         amigos.add(amigo);
     }

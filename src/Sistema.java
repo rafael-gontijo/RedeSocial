@@ -1,9 +1,11 @@
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Sistema {
     private List<Usuario> usuarios;
-    private Usuario usuarioLogado;  // Para manter o controle do usuário logado
+    private Usuario usuarioLogado;
 
     public Sistema() {
         this.usuarios = new ArrayList<>();
@@ -17,6 +19,80 @@ public class Sistema {
         return usuarioLogado;
     }
 
+    public void cadastrarUsuarioGui(String nome, String email, String senha) {
+        if (buscarUsuarioPorEmail(email) == null) {
+            Usuario novoUsuario = new Usuario(nome, email, senha);
+            usuarios.add(novoUsuario);
+            JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Este email já está em uso. Tente outro.");
+        }
+    }
+
+    public boolean loginGui(String email, String senha) {
+        Usuario usuario = buscarUsuarioPorEmail(email);
+        if (usuario != null && usuario.getSenha().equals(senha)) {
+            usuarioLogado = usuario;
+            JOptionPane.showMessageDialog(null, "Login bem-sucedido!");
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Email ou senha incorretos. Tente novamente.");
+            return false;
+        }
+    }
+
+    public void adicionarAmigoGui(String emailAmigo) {
+        if (getUsuarioLogado() != null) {
+            Usuario amigo = buscarUsuarioPorEmail(emailAmigo);
+            if (amigo != null) {
+                if (!usuarioLogado.equals(amigo) && !saoAmigos(usuarioLogado, amigo)) {
+                    Amigo novoAmigo = new Amigo(amigo);
+                    usuarioLogado.adicionarAmigo(novoAmigo);
+                    JOptionPane.showMessageDialog(null, "Amigo adicionado com sucesso!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Você já é amigo deste usuário.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Você precisa estar logado para adicionar amigos.");
+        }
+    }
+
+    public void consultarAmigosGUI() {
+        if (usuarioLogado == null) {
+            JOptionPane.showMessageDialog(null, "Você precisa estar logado para consultar amigos.");
+            return;
+        }
+        List<Amigo> amigos = usuarioLogado.getAmigos();
+        if (amigos.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Você não tem amigos ainda.");
+        } else {
+            String msg = "";
+            for (int i = 1; i <= amigos.size(); i++) {
+                var name = amigos.get(i-1);
+                msg += String.format("%d - %s\n", i, name.getUsuario().getNome() );
+            }
+            JOptionPane.showMessageDialog(null, "Lista de Amigos\n" + msg);
+            }
+        }
+    public void enviarMensagemGui(String emailDestinatario, String conteudo) {
+        if (usuarioLogado == null) {
+            JOptionPane.showMessageDialog(null, "Você precisa estar logado para enviar mensagens.");
+            return;
+        }
+        Usuario destinatario = buscarUsuarioPorEmail(emailDestinatario);
+
+        if (destinatario != null) {
+            Mensagem mensagem = new Mensagem(usuarioLogado, destinatario, conteudo);
+            usuarioLogado.getMensagensEnviadas().add(mensagem);
+            destinatario.getMensagensRecebidas().add(mensagem);
+            System.out.println("Mensagem enviada com sucesso!");
+        } else {
+            System.out.println("Usuário não encontrado.");
+        }
+    }
     public void cadastrarUsuario(String nome, String email, String senha) {
         // Verificar se o email já está em uso
         if (buscarUsuarioPorEmail(email) == null) {
@@ -40,7 +116,6 @@ public class Sistema {
             return false;
         }
     }
-
     public void adicionarAmigo(String emailAmigo) {
         if (usuarioLogado == null) {
             System.out.println("Você precisa estar logado para adicionar amigos.");
@@ -157,7 +232,7 @@ public class Sistema {
     public void logout() {
         if (usuarioLogado != null) {
             System.out.println("Logout bem-sucedido. Até mais, " + usuarioLogado.getNome() + "!");
-            usuarioLogado = null; // Limpa o usuário logado
+            usuarioLogado = null;
         } else {
             System.out.println("Nenhum usuário logado.");
         }

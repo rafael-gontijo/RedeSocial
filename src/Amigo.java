@@ -4,6 +4,7 @@ public class Amigo {
     public Amigo(Usuario usuario) {
         this.usuario = usuario;
     }
+
     public Usuario getUsuario() {
         return usuario;
     }

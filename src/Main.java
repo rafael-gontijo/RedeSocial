@@ -18,7 +18,7 @@ public class Main {
                 System.out.println("7. Visualizar Mensagens Recebidas");
                 System.out.println("8. Logout");
                 System.out.println("0. Sair");
-            }else{
+            } else {
                 System.out.println("1. Cadastrar Usuário");
                 System.out.println("2. Login");
                 System.out.println("3. Adicionar Amigo");
