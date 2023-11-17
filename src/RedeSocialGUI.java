@@ -81,8 +81,6 @@ public class RedeSocialGUI extends JFrame {
             }
         });
 
-
-
         panel1.add(buttonTarefa1);
         panel1.add(buttonTarefa2);
         panel1.add(buttonTarefa3);
@@ -92,14 +90,11 @@ public class RedeSocialGUI extends JFrame {
         panel1.add(buttonTarefa7);
         panel1.add(buttonTarefa8);
 
-
-
         this.getContentPane().add(panel1);
-        this.setLocationRelativeTo(null); // Centralizar janela
+        this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setVisible(true); // Exibir janela
+        this.setVisible(true);
     }
-
     public static void main(String[] args) {
         new RedeSocialGUI();
     }
