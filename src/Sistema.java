@@ -88,9 +88,54 @@ public class Sistema {
             Mensagem mensagem = new Mensagem(usuarioLogado, destinatario, conteudo);
             usuarioLogado.getMensagensEnviadas().add(mensagem);
             destinatario.getMensagensRecebidas().add(mensagem);
-            System.out.println("Mensagem enviada com sucesso!");
+            JOptionPane.showMessageDialog(null, "Mensagem enviada com sucesso!");
         } else {
-            System.out.println("Usuário não encontrado.");
+            JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
+        }
+    }
+    public void visualizarMensagensEnviadasGui() {
+        if (usuarioLogado == null) {
+            JOptionPane.showMessageDialog(null, "Você precisa estar logado para visualizar mensagens enviadas.");
+            return;
+        }
+        List<Mensagem> mensagensEnviadas = usuarioLogado.getMensagensEnviadas();
+
+        if (mensagensEnviadas.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Você não enviou mensagens ainda.");
+        } else {
+            String msg = "";
+            for (int i = 1; i <= mensagensEnviadas.size(); i++) {
+                var mEnviada = mensagensEnviadas.get(i-1);
+                msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getDestinatario());
+            }
+            JOptionPane.showMessageDialog(null, "Mensagens Enviadas:\n" + msg);
+        }
+    }
+    public void visualizarMensagensRecebidasGui() {
+        if (usuarioLogado == null) {
+            JOptionPane.showMessageDialog(null, "Você precisa estar logado para visualizar mensagens recebidas.");
+            return;
+        }
+        List<Mensagem> mensagensRecebidas = usuarioLogado.getMensagensRecebidas();
+
+        if (mensagensRecebidas.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Você não recebeu mensagens ainda.");
+        } else {
+            String msg = "";
+            for (int i = 1; i <= mensagensRecebidas.size(); i++) {
+                var mEnviada = mensagensRecebidas.get(i-1);
+                msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getDestinatario());
+            }
+            JOptionPane.showMessageDialog(null, "Mensagens Recebidas:\n" + msg);
+        }
+    }
+
+    public void logoutGui() {
+        if (usuarioLogado != null) {
+            JOptionPane.showMessageDialog(null, "Logout bem-sucedido. Até mais, " + usuarioLogado.getNome() + "!");
+            usuarioLogado = null;
+        } else {
+            JOptionPane.showMessageDialog(null, "Nenhum usuário logado.");
         }
     }
     public void cadastrarUsuario(String nome, String email, String senha) {
@@ -204,7 +249,7 @@ public class Sistema {
         } else {
             System.out.println("Suas mensagens enviadas:");
             for (Mensagem mensagem : mensagensEnviadas) {
-                System.out.println(mensagem);
+                System.out.println(mensagem.getConteudo());
                 System.out.println("-----------");
             }
         }
@@ -223,7 +268,7 @@ public class Sistema {
         } else {
             System.out.println("Suas mensagens recebidas:");
             for (Mensagem mensagem : mensagensRecebidas) {
-                System.out.println(mensagem);
+                System.out.println(mensagem.getConteudo());
                 System.out.println("-----------");
             }
         }
