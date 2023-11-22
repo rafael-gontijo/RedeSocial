@@ -106,7 +106,7 @@ public class Sistema {
             String msg = "";
             for (int i = 1; i <= mensagensEnviadas.size(); i++) {
                 var mEnviada = mensagensEnviadas.get(i-1);
-                msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getDestinatario());
+                msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getDestinatario().getNome());
             }
             JOptionPane.showMessageDialog(null, "Mensagens Enviadas:\n" + msg);
         }
@@ -124,7 +124,7 @@ public class Sistema {
             String msg = "";
             for (int i = 1; i <= mensagensRecebidas.size(); i++) {
                 var mEnviada = mensagensRecebidas.get(i-1);
-                msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getDestinatario());
+                msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getRemetente().getNome());
             }
             JOptionPane.showMessageDialog(null, "Mensagens Recebidas:\n" + msg);
         }
