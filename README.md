@@ -29,7 +29,7 @@ O programa permite ao usuário cadastrar, logar, adicionar amigos, enviar e rece
 2. Acesse o diretório do projeto:
 
    ```shell
-   cd .\lista-tarefas-gui\src\
+   cd .\RedeSocial\src\
    ```
 
 3. Utilize o Java para executar o arquivo:
