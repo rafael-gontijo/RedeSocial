@@ -65,6 +65,7 @@ O programa permite ao usuário cadastrar, logar, adicionar amigos, enviar e rece
 ## Menu via terminal Rede Social:
 
 LogOFF
+
 ===== Mini Simulador de Rede Social =====
 1. Cadastrar Usuário
 2. Login
@@ -72,6 +73,7 @@ LogOFF
 Escolha uma opção:
 
 LogON
+
 ===== Mini Simulador de Rede Social =====
 Bem-vindo, Rafael!
 1. Adicionar Amigo
