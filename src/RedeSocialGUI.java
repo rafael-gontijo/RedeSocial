@@ -129,6 +129,7 @@ public class RedeSocialGUI extends JFrame {
         panel2.add(buttonTarefa7);
         panel2.add(buttonTarefa8);
         panel2.setVisible(true);
+        panel2.setBackground(new Color(0, 0, 255));
         panel1.setVisible(false);
         this.getContentPane().add(panel2);
         this.getContentPane().remove(panel1);

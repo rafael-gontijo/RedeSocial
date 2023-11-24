@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -19,13 +20,128 @@ public class Sistema {
         return usuarioLogado;
     }
 
+    private static final String URL = "jdbc:postgresql://localhost:5432/Rede Social";
+    private static final String USER = "postgres";
+    private static final String PASS = "xxxxxx";
+
+    public int buscarIdUsuarioPorEmail(String email) {
+        String sql = "SELECT id FROM usuarios WHERE email = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("id");
+                } else {
+                    System.out.println("Usuário não encontrado para o email: " + email);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Erro ao conectar ou executar a consulta SQL.");
+            ex.printStackTrace();
+        }
+
+        // Retorna -1 se não encontrar o ID correspondente ao email
+        return -1;
+    }
+
     public void cadastrarUsuarioGui(String nome, String email, String senha) {
         if (buscarUsuarioPorEmail(email) == null) {
             Usuario novoUsuario = new Usuario(nome, email, senha);
             usuarios.add(novoUsuario);
             JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
+            gravarUsuarioBD(nome, email, senha);
         } else {
             JOptionPane.showMessageDialog(null, "Este email já está em uso. Tente outro.");
+        }
+    }
+
+    public void gravarUsuarioBD(String nome, String email, String senha) {
+        String sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            statement.setString(1, nome);
+            statement.setString(2, email);
+            statement.setString(3, senha);
+
+            int rowsInserted = statement.executeUpdate();
+
+            if (rowsInserted > 0) {
+                System.out.println("Usuário inserido com sucesso no banco de dados!");
+            } else {
+                System.out.println("Falha ao inserir usuário no banco de dados.");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Erro ao conectar ou executar a consulta SQL.");
+            ex.printStackTrace();
+        }
+    }
+
+    public void gravarMensagemBD(String remetenteEmail, String destinatarioEmail, String conteudo) {
+        int remetenteId = buscarIdUsuarioPorEmail(remetenteEmail);
+        int destinatarioId = buscarIdUsuarioPorEmail(destinatarioEmail);
+
+        if (remetenteId != -1 && destinatarioId != -1) {
+            String sql = "INSERT INTO mensagens (remetente_id, destinatario_id, conteudo) VALUES (?, ?, ?)";
+
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                 PreparedStatement statement = conn.prepareStatement(sql)) {
+
+                statement.setInt(1, remetenteId);
+                statement.setInt(2, destinatarioId);
+                statement.setString(3, conteudo);
+
+                int rowsInserted = statement.executeUpdate();
+
+                if (rowsInserted > 0) {
+                    System.out.println("Mensagem inserida com sucesso no banco de dados!");
+                } else {
+                    System.out.println("Falha ao inserir mensagem no banco de dados.");
+                }
+
+            } catch (SQLException ex) {
+                System.out.println("Erro ao conectar ou executar a consulta SQL.");
+                ex.printStackTrace();
+            }
+        } else {
+            System.out.println("Falha ao obter IDs de remetente ou destinatário.");
+        }
+    }
+
+    public void gravarAmigoBD(String usuarioEmail, String amigoEmail) {
+        int usuarioId = buscarIdUsuarioPorEmail(usuarioEmail);
+        int amigoId = buscarIdUsuarioPorEmail(amigoEmail);
+
+        if (usuarioId != -1 && amigoId != -1) {
+            String sql = "INSERT INTO amigos (usuario_id, amigo_id) VALUES (?, ?)";
+
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                 PreparedStatement statement = conn.prepareStatement(sql)) {
+
+                statement.setInt(1, usuarioId);
+                statement.setInt(2, amigoId);
+
+                int rowsInserted = statement.executeUpdate();
+
+                if (rowsInserted > 0) {
+                    System.out.println("Amigo adicionado com sucesso no banco de dados!");
+                } else {
+                    System.out.println("Falha ao adicionar amigo no banco de dados.");
+                }
+
+            } catch (SQLException ex) {
+                System.out.println("Erro ao conectar ou executar a consulta SQL.");
+                ex.printStackTrace();
+            }
+        } else {
+            System.out.println("Falha ao obter IDs de usuário ou amigo.");
         }
     }
 
@@ -49,6 +165,7 @@ public class Sistema {
                     Amigo novoAmigo = new Amigo(amigo);
                     usuarioLogado.adicionarAmigo(novoAmigo);
                     JOptionPane.showMessageDialog(null, "Amigo adicionado com sucesso!");
+                    gravarAmigoBD(usuarioLogado.getEmail(), emailAmigo);
                 } else {
                     JOptionPane.showMessageDialog(null, "Você já é amigo deste usuário.");
                 }
@@ -71,12 +188,13 @@ public class Sistema {
         } else {
             String msg = "";
             for (int i = 1; i <= amigos.size(); i++) {
-                var name = amigos.get(i-1);
-                msg += String.format("%d - %s\n", i, name.getUsuario().getNome() );
+                var name = amigos.get(i - 1);
+                msg += String.format("%d - %s\n", i, name.getUsuario().getNome());
             }
             JOptionPane.showMessageDialog(null, "Lista de Amigos\n" + msg);
-            }
         }
+    }
+
     public void enviarMensagemGui(String emailDestinatario, String conteudo) {
         if (usuarioLogado == null) {
             JOptionPane.showMessageDialog(null, "Você precisa estar logado para enviar mensagens.");
@@ -89,10 +207,12 @@ public class Sistema {
             usuarioLogado.getMensagensEnviadas().add(mensagem);
             destinatario.getMensagensRecebidas().add(mensagem);
             JOptionPane.showMessageDialog(null, "Mensagem enviada com sucesso!");
+            gravarMensagemBD(usuarioLogado.getEmail(), emailDestinatario, conteudo);
         } else {
             JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
         }
     }
+
     public void visualizarMensagensEnviadasGui() {
         if (usuarioLogado == null) {
             JOptionPane.showMessageDialog(null, "Você precisa estar logado para visualizar mensagens enviadas.");
@@ -105,12 +225,13 @@ public class Sistema {
         } else {
             String msg = "";
             for (int i = 1; i <= mensagensEnviadas.size(); i++) {
-                var mEnviada = mensagensEnviadas.get(i-1);
+                var mEnviada = mensagensEnviadas.get(i - 1);
                 msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getDestinatario().getNome());
             }
             JOptionPane.showMessageDialog(null, "Mensagens Enviadas:\n" + msg);
         }
     }
+
     public void visualizarMensagensRecebidasGui() {
         if (usuarioLogado == null) {
             JOptionPane.showMessageDialog(null, "Você precisa estar logado para visualizar mensagens recebidas.");
@@ -123,7 +244,7 @@ public class Sistema {
         } else {
             String msg = "";
             for (int i = 1; i <= mensagensRecebidas.size(); i++) {
-                var mEnviada = mensagensRecebidas.get(i-1);
+                var mEnviada = mensagensRecebidas.get(i - 1);
                 msg += String.format("%d - %s - %s\n", i, mEnviada.getConteudo(), mEnviada.getRemetente().getNome());
             }
             JOptionPane.showMessageDialog(null, "Mensagens Recebidas:\n" + msg);
@@ -138,6 +259,7 @@ public class Sistema {
             JOptionPane.showMessageDialog(null, "Nenhum usuário logado.");
         }
     }
+
     public void cadastrarUsuario(String nome, String email, String senha) {
         // Verificar se o email já está em uso
         if (buscarUsuarioPorEmail(email) == null) {
@@ -161,9 +283,15 @@ public class Sistema {
             return false;
         }
     }
+
     public void adicionarAmigo(String emailAmigo) {
         if (usuarioLogado == null) {
-            System.out.println("Você precisa estar logado para adicionar amigos.");
+            System.out.println("Erro: Você precisa estar logado para adicionar amigos.");
+            return;
+        }
+
+        if (emailAmigo == null || emailAmigo.isEmpty()) {
+            System.out.println("Erro: O email do amigo não pode ser vazio.");
             return;
         }
 
@@ -175,12 +303,13 @@ public class Sistema {
                 usuarioLogado.adicionarAmigo(novoAmigo);
                 System.out.println("Amigo adicionado com sucesso!");
             } else {
-                System.out.println("Você já é amigo deste usuário.");
+                System.out.println("Erro: Você já é amigo deste usuário.");
             }
         } else {
-            System.out.println("Usuário não encontrado.");
+            System.out.println("Erro: Usuário não encontrado.");
         }
     }
+
 
     public void consultarAmigos() {
         if (usuarioLogado == null) {
