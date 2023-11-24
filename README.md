@@ -17,6 +17,8 @@ O programa permite ao usuário cadastrar, logar, adicionar amigos, enviar e rece
 - JDK (Java Development Kit): versão 17
 - Git: version 2.40.0.windows.1
 - Bibliotecas padrão do Java: Scanner, Swing.
+- PGAdmin4 instalado na máquina.
+- PostregreSQL 16 instalado
 ```
 ## Como Executar
 
@@ -31,8 +33,10 @@ O programa permite ao usuário cadastrar, logar, adicionar amigos, enviar e rece
    ```shell
    cd .\RedeSocial\src\
    ```
-
-3. Utilize o Java para executar o arquivo:
+   
+3. Utilize o aquivo txt.sql para criar o banco de dados no PGAdmin4.
+   
+4. Utilize o Java para executar o arquivo:
    ## Via console
    ```shell
    java .\Main.java
@@ -88,5 +92,20 @@ Escolha uma opção:
 
 **Tela Inicial**
 
-<img src="prints/
+<img src="imgs/tela_inicial.jpg">
 
+**Tela Usuario**
+
+<img src="imgs/usuario.jpg">
+
+**Consulta Usuários - Banco de Dados**
+
+<img src="imgs/usuarios_bd.jpg">
+
+**Consulta Amigos - Banco de Dados**
+
+<img src="imgs/amigos_bd.jpg">
+
+**Consulta Mensagens - Banco de Dados**
+
+<img src="imgs/mensagens_bd.jpg">
