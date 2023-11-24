@@ -22,7 +22,7 @@ public class Sistema {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/Rede Social";
     private static final String USER = "postgres";
-    private static final String PASS = "xxxxxx";
+    private static final String PASS = "12345";
 
     public int buscarIdUsuarioPorEmail(String email) {
         String sql = "SELECT id FROM usuarios WHERE email = ?";
